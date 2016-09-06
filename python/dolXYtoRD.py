@@ -44,6 +44,10 @@ def xyToRd(filPhot='blah.xym', filWCS='', filOut='', \
     If filWCS has zero length, or is not found in the working
     directory, its name will be constructed assuming a convention."""
 
+    ### NOTE - most of the lines in what follow are filename
+    ### handling. The actual conversion doesn't start until the
+    ### Table.read() syntax about halfway down.
+
     if not os.access(filPhot, os.R_OK):
         if Verbose:
             print "dolXYtoRD.xyToRd WARN - cannot read input path %s" \
