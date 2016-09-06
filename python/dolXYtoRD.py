@@ -137,6 +137,10 @@ def xyToRd(filPhot='blah.xym', filWCS='', filOut='', \
     tPhot['RA'] = world[0]
     tPhot['DEC'] = world[1]
 
+    # 2016-09-06 --- we likely need to cut down the columns written
+    # out, otherwise the resulting tables will get very large very
+    # quickly! Check the *.columns file to pick the useful outputs.
+
     tPhot.write(filOut, overwrite=True)
 
     return filOut
