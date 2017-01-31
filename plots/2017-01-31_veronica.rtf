@@ -1,0 +1,38 @@
+Hello Andreas and Will (Hi Will!)
+
+  Friday 3 pm is ok for me.
+
+
+  As a brief summary for Will, we already got the magnitudes (for the flc and clean images, we will choose between them later) and for both cameras. We have started to study the isochrones and correct from extinction in order to fit them to our observational data. However, during this process, we realised that the magnitudes given by Dolphot are too large and since then Andreas and I are crying. 
+
+  I have attached an example of CMD with an isochrone (already corrected of extinction) and our values for the magnitudes, cluster NGC6553.  If you compare to the literature (an example, Beaulieu et al. 2001) the difference in the TO is roughly 2-3 magn. The values I have used for the extinction are also from the literature (depends on the paper but in general [Fe/H]=-0.2, E(B-V)=0.7), distance=5 kpc, 6 Kpc in Harris catalogue).
+
+  My attack plan at this moment has 4 directions depending on the origin of the problem. Assuming that Dolphot carried out a wrong sky subtraction: 
+
+  1. Run Dolphot only on images with the same exposure time. Matthias and I were talking about mixing all the images for the same filter, independently the exposure time, to get the drizzled image. Consequently, it could have written or overwritten something in the headers incorrect both for the reference drizzled image and the _flc images.
+
+ 2. During some step in Astrodrizzle it is necessary to turn on/off the sky subtraction, depending on the filters, if it is a narrow or a broad one. This could have some effect in the reference image.
+
+  
+
+ And if the problem comes from the Zero Point:
+
+ 1. It seems there is a parameter in Dolphot to specify the zero point and the default value is 25. I haven't noticed it until today because this parameter appeared neither in any of the Configuration Files I have copied from (written by very VERY smart people) nor in the example of the handbook. Therefore, I will read the headers and write the same zero point (keyword PHOTFLAM) in the configuration file.
+
+2. I have found an equation to change the magnitudes to the VEGA system and here it is necessary the zero point. It is written on the web page of the HST. I have done some preliminary test and as I thought it is not helpful. However, at this point, I will give it a try. 
+
+
+
+
+ If all this doesn't succeed, then I have no idea what to do. That will be the moment when I will go into Andreas' office without any solution and with a lightsaber.
+
+
+
+ If you need something more from me, please, let me know. I am at your disposal.
+
+
+ Kind Regards
+
+
+ Veronica
+
