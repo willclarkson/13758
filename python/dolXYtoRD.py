@@ -22,7 +22,8 @@ def xyToRd(filPhot='blah.xym', filWCS='', filOut='', \
                Debug=True):
 
     """Converts pixels to ra, dec, using the World Coordinate System
-    encoded in (usually fits) file filWCS. Returns the name of the output file if successful, a zero-length blank string otherwise.
+    encoded in (usually fits) file filWCS. Returns the name of the
+    output file if successful, a zero-length blank string otherwise.
 
     Inputs:
 
@@ -204,3 +205,5 @@ def getWcsNameFromInfo(filInfo='blah.info', sSplit='.chip', sRep='_flc.fits'):
     sWCS = '%s%s' % (fileStem, sRep)
 
     return sWCS
+
+
