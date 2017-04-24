@@ -160,7 +160,10 @@ selection"""
             return
 
         # load the table, initialize the boolean
-        self.tPhot = Table.read(self.pathPhot)
+        try:
+            self.tPhot = Table.read(self.pathPhot)
+        except:
+            self.tPhot = Table.read(self.pathPhot, format='ascii')
         self.bUse = np.repeat(True, len(self.tPhot))
 
         # reference RA, DEC for tangent plane projection. We'll work
@@ -536,6 +539,14 @@ already have a file in mind, say).
 
         print "=== INFO === sample for fitting:", \
             np.shape(dists), np.sum(bTry), np.shape(self.rowsPhot), np.shape(self.rowsAst)
+
+        ############ Deubg plot figure comes below. This is all very
+        ############ messy still!!
+
+        coloCrosshair='0.6'
+        coloFound='m'
+        lwFound=2
+        nBins=150
         
         figDelta = plt.figure(2)
         figDelta.clf()
@@ -565,8 +576,17 @@ already have a file in mind, say).
         ax3.set_ylim(-2., 2.)
         ax3.grid(which='both', color='0.75')
 
-        ax3.plot([0.,0.], [-2., 2.], color='k', zorder=1)
-        ax3.plot([-2., 2.], [0., 0.], color='k', zorder=1)
+        # plot guidelines for the axis
+        ax3.plot([0.,0.], [-2., 2.], color=coloCrosshair, \
+                 zorder=1)
+        ax3.plot([-2., 2.], [0., 0.], color=coloCrosshair, \
+                 zorder=1)
+
+        # also plot the deltas found.
+        ax3.plot([meanRA, meanRA], [-2., 2.], zorder=15, lw=lwFound, \
+                 color=coloFound)
+        ax3.plot([-2., 2.], [meanDE, meanDE], zorder=15, lw=lwFound, \
+                 color=coloFound)
 
         #hist2 = ax3.hist2d(dra*3600., dde*3600., bins=(20,20), zorder=1, \
 #range=[[-2., 2.],[-2., 2.]], norm=LogNorm()re)
@@ -577,18 +597,23 @@ already have a file in mind, say).
         print meanRA, meanDE
 
         ax1 = figDelta.add_subplot(221, sharex=ax3, alpha=0.5)
-        dum = ax1.hist(dra*3600., bins=100, alpha=0.5, log=True, \
+        dum = ax1.hist(dra*3600., bins=nBins, alpha=0.5, log=True, \
                            edgecolor='None', color='b')
         ax1.grid(which='both', color='0.75')
         ax1.xaxis.tick_top()
 
-        ax1.plot([0.0,0.0], [1, 1000.]  , 'k-')
-
+        # get the current limit
+        ymax1 = ax1.get_ylim()[-1]
+        
+        ax1.plot([0.0,0.0], [1, ymax1]  , color=coloCrosshair)
+        ax1.plot([meanRA, meanRA], [1, ymax1], lw=lwFound, \
+                 color=coloFound)
+        
         ax1.set_ylabel(r"$N(\Delta \alpha)$")
 
 
         ax4 = figDelta.add_subplot(224, sharey=ax3)
-        dum = ax4.hist(dde*3600., bins=100, alpha=0.5, \
+        dum = ax4.hist(dde*3600., bins=nBins, alpha=0.5, \
                            orientation='horizontal', log=True, \
                            edgecolor='None', color='b')
         ax4.grid(which='both', color='0.75')
@@ -596,8 +621,12 @@ already have a file in mind, say).
 
         ax4.set_xlabel(r"$N(\Delta \delta)$")
 
-
-        ax4.plot([1, 1000.], [0., 0.]  , 'k-')
+        # get the current limit
+        xmax4 = ax4.get_xlim()[-1]
+        
+        ax4.plot([1, xmax4], [0., 0.], color=coloCrosshair)
+        ax4.plot([1, xmax4], [meanDE, meanDE]  , lw=lwFound, \
+                 color=coloFound)
 
 
         ax3.set_xlim(-2., 2.)
@@ -652,7 +681,7 @@ already have a file in mind, say).
         print len(self.rowsPhot), len(self.tPhot)
 
         mags = self.tPhot[self.colMag]
-        bGood = mags < 20.
+        bGood = mags < 35.
 
         rang = [np.min(mags[bGood]), np.max(mags[bGood])]
 
@@ -791,25 +820,28 @@ already have a file in mind, say).
                 dThis = self.selectionLims[sKey]
                 sSel = '%s_%.1f-%.1f' % (sKey, dThis[0], dThis[1])
 
-                stemPhot = '%s_%s' % (stemPhot, sSel)
+                stemPhot = '%s_%s_%s' % (stemPhot, self.catalog, sSel)
         except:
             dumdum = 1
                 
         self.pathAst = '%s/%s_AST.fits' % (self.dirAst, stemPhot)
             
-    def writeAstCat(self):
+    def writeAstCat(self, Clobber=False):
 
         """Writes astrom catalog to disk"""
 
         if len(self.tAst) < 1:
             return
 
+        if os.access(self.pathAst, os.R_OK) and not Clobber:
+            return
+        
         # ensure the output directory exists. Inherit from the path
         # rather than the separate directory variable
         dirAst = os.path.split(self.pathAst)[0]
         if not os.access(dirAst, os.R_OK) and len(dirAst) > 1:
             os.makedirs(dirAst)
-        
+
         if self.pathAst.find('csv') > -1:
             print "Writing astrom catalog..."
             
@@ -846,7 +878,7 @@ already have a file in mind, say).
 def testRegion(magLo=14., magHi=18., pathIn='', tryChandra=False, \
                debugNudge=False, iters=5, colRA='RA', colDE='DEC', \
                colMag='Instrumental_VEGAMAG', \
-               img2Shift=''):
+               img2Shift='', showLog=False):
 
     """Tests the region bounding the photometry catalog.
 
@@ -855,6 +887,13 @@ def testRegion(magLo=14., magHi=18., pathIn='', tryChandra=False, \
 
     astToExternal.testRegion(pathIn='f625w_detection.FIT', colRA='ALPHA_J2000', colDE='DELTA_J2000', colMag='MAG_ISO', magLo=-11., magHi=-8., iters=7, img2Shift='f625w_drz_sci_0p7.fits')
     """
+
+    # note (to turn into proper documentation later) - to run this on
+    # F390M testing on desktop:
+    #
+    # cd /home/wiclarks/Data/scratch/testBoresight/veronicaDOLPHOT
+
+    # astToExternal.testRegion(pathIn='TEST_bothChips.fits', magHi=23, magLo=18, showLog=True)
 
     OC = ObsCat(pathPhot=pathIn[:])
     OC.colRA = colRA[:]
@@ -892,6 +931,7 @@ def testRegion(magLo=14., magHi=18., pathIn='', tryChandra=False, \
     OC.showSelectedPoints()
 
     OC.getAstCat()
+    OC.writeAstCat()
 
     # Try putting both onto the tangent plane
     # OC.deprojectBothToTangentPlane()
@@ -910,7 +950,7 @@ def testRegion(magLo=14., magHi=18., pathIn='', tryChandra=False, \
     print "Starting matching..."
     OC.matchOnSphere()
 
-    OC.showDistributions()
+    OC.showDistributions(doLog=showLog)
     return
 
     OC.showSelectedPoints()
