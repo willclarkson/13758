@@ -803,6 +803,8 @@ already have a file in mind, say).
         if np.size(self.plotBox) > 0:
             plt.plot(self.plotBox[0], self.plotBox[1], 'g-', lw=2)
 
+        plt.savefig('ast2ext_boundingBox.png')
+            
     def setPathAst(self):
 
         """Sets the path for the astrometric catalog"""
