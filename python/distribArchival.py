@@ -80,7 +80,12 @@ def getFileInfo(filePath=''):
 
     LMove = glob.glob('%s/%s*fits*' % (dirIn, fStem))
 
-    print LMove
+    # now do the move
+    for sFil in LMove:
+        pathSrc = sFil[:]
+        filDest = os.path.splt(sFil)[-1]
+        pathDest = '%s/%s' % (dirOu, filDest)
+        print pathSrc, pathDest
     
 def getFilter(hdr):
 
