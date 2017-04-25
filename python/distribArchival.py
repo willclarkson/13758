@@ -124,3 +124,10 @@ def go(srchStr='.fits', doAll=True, doMove=False):
     
     for iFil in range(iMax):
         getFileInfo(LFits[iFil])
+
+def goInSequence():
+
+    """Go through the frames in sequence"""
+
+    for sStr in ['drz.fits', 'flt.fits', 'c0m.fits']:
+        go(sStr, True, True)
