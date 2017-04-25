@@ -49,7 +49,7 @@ def getFilter(hdr):
     """Returns the filter from the header"""
 
     filtr='NONE'
-    for filtKey in ['FILTNAM', 'FILTER1']:
+    for filtKey in ['FILTNAM1', 'FILTER1']:
         try:
             filtr=hdr[filtKey]
             break
