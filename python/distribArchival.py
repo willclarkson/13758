@@ -28,9 +28,20 @@ def getFileInfo(filePath=''):
         return
 
     hdr = fits.getheader(filePath, 0)
+    fSho = os.path.split(filePath)[-1]
+    fStem = fSho.split('_')[0]
+    
+    try:
+        propID = hdr['PROPOSID']
+        instrume = hdr['INSTRUME']
+        targname = hdr['TARGNAME'].replace('-','')
+    except:
+        noID = True
+        print fSho
+        return
 
-    print os.path.split(filePath)[-1], hdr['PROPOSID']
-
+    print fSho, fStem, propID, instrume, targname
+    
 def go():
 
     """Wrapper - does the searching"""
