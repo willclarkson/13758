@@ -52,8 +52,11 @@ def getFileInfo(filePath=''):
         filtr='CALIB'
         exptime = ''
 
-    if len(propID) < 1:
+    if len(str(propID)) < 1:
         propID = 'CAL'
+
+    if len(targname) < 1:
+        targname = 'NONE'
         
     print fSho, fStem, propID, instrume, targname, exptime, filtr
 
