@@ -73,7 +73,15 @@ def getFileInfo(filePath=''):
         dirSub = '%s/%s' % (dirSub, fSho.split('.fits')[0])
 
     print fSho, fStem, dirSub
-        
+
+    # ok now find all the fits files matching this particular stem
+    dirIn = os.path.split(filePath)[0]
+    dirOu = dirIn+'/'+dirSub
+
+    LMove = glob.glob('%s/%s*fits*' % (dirIn, fStem))
+
+    print LMove
+    
 def getFilter(hdr):
 
     """Returns the filter from the header"""
