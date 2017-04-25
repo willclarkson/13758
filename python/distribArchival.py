@@ -48,14 +48,18 @@ def getFilter(hdr):
 
     """Returns the filter from the header"""
 
-    filtr='NONE'
+    filtr=''
     for filtKey in ['FILTNAM1', 'FILTER1']:
+        if len(filtr) > 0:
+            continue
         try:
             filtr=hdr[filtKey]
-            break
         except:
             notFilt = True
 
+    if len(filtr) < 1:
+        filtr='NONE'
+            
     return filtr
             
 def go(srchStr='.fits'):
