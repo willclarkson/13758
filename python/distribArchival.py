@@ -83,7 +83,7 @@ def getFileInfo(filePath=''):
     # now do the move
     for sFil in LMove:
         pathSrc = sFil[:]
-        filDest = os.path.splt(sFil)[-1]
+        filDest = os.path.split(sFil)[-1]
         pathDest = '%s/%s' % (dirOu, filDest)
         print pathSrc, pathDest
     
