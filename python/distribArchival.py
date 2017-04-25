@@ -42,11 +42,11 @@ def getFileInfo(filePath=''):
 
     print fSho, fStem, propID, instrume, targname
     
-def go():
+def go(srchStr='.fits'):
 
     """Wrapper - does the searching"""
 
-    LFits = findFits()
+    LFits = findFits(srchString=srchStr)
 
     print len(LFits)
 
