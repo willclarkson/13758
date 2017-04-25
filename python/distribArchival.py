@@ -44,6 +44,20 @@ def getFileInfo(filePath=''):
 
     print fSho, fStem, propID, instrume, targname, exptime, filtr
 
+    # use the information we have gathered to produce a destination
+    # directory
+    dirSub = '%s/%s/%s/%s' % (propID, targname, instrume, filtr)
+
+    # drizzled files get their own directory - at least one
+    # investigator here has combined multiple exptimes into the same
+    # images.
+    if fSho.find('drz.fits') < 0:
+        dirSub = '%s/%s' % (dirSub, exptime)
+    else:
+        dirSub = '%s/%s' % (dirSub, fSho.split(.fits)[0])
+
+    print dirSub
+        
 def getFilter(hdr):
 
     """Returns the filter from the header"""
