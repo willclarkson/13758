@@ -19,6 +19,18 @@ def findFits(dirTop="", srchString='.fits'):
 
     return lFits
 
+def getFileInfo(filePath=''):
+    
+    if len(filePath) < 1:
+        return
+
+    if not os.access(filePath, os.R_OK):
+        return
+
+    hdr = fits.getheader(filePath, 0)
+
+    print os.path.split(filePath)[-1], hdr['PROPOSID']
+
 def go():
 
     """Wrapper - does the searching"""
@@ -26,3 +38,6 @@ def go():
     LFits = findFits()
 
     print len(LFits)
+
+    for iFil in range(3):
+        getFileInfo(LFits[iFil])
