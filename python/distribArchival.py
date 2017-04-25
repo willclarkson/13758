@@ -52,6 +52,7 @@ def getFilter(hdr):
     for filtKey in ['FILTNAM', 'FILTER1']:
         try:
             filtr=hdr[filtKey]
+            break
         except:
             notFilt = True
 
