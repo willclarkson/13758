@@ -54,7 +54,7 @@ def getFileInfo(filePath=''):
     if fSho.find('drz.fits') < 0:
         dirSub = '%s/%s' % (dirSub, exptime)
     else:
-        dirSub = '%s/%s' % (dirSub, fSho.split(.fits)[0])
+        dirSub = '%s/%s' % (dirSub, fSho.split('.fits')[0])
 
     print dirSub
         
