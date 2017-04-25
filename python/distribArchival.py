@@ -42,6 +42,18 @@ def getFileInfo(filePath=''):
         print fSho
         return
 
+    # if no exptime, must be calib
+    try:
+        exptime = str(hdr['EXPTIME']).replace('.','p')
+        filtr = getFilter(hdr)
+        isCalib = False
+    except:
+        isCalib = True
+
+    if isCalib:
+        filtr='CALIB'
+        exptime = ''
+        
     print fSho, fStem, propID, instrume, targname, exptime, filtr
 
     # use the information we have gathered to produce a destination
@@ -51,7 +63,7 @@ def getFileInfo(filePath=''):
     # drizzled files get their own directory - at least one
     # investigator here has combined multiple exptimes into the same
     # images.
-    if fSho.find('drz.fits') < 0:
+    if fSho.find('drz.fits') < 0 and len(exptime) > 0:
         dirSub = '%s/%s' % (dirSub, exptime)
     else:
         dirSub = '%s/%s' % (dirSub, fSho.split('.fits')[0])
