@@ -76,7 +76,7 @@ def getFilter(hdr):
             
     return filtr
             
-def go(srchStr='.fits'):
+def go(srchStr='.fits', doAll=True):
 
     """Wrapper - does the searching"""
 
@@ -84,5 +84,9 @@ def go(srchStr='.fits'):
 
     print len(LFits)
 
-    for iFil in range(3):
+    iMax = 3
+    if doAll:
+        iMax = len(LFits)
+    
+    for iFil in range(iMax):
         getFileInfo(LFits[iFil])
