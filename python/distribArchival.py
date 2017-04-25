@@ -35,12 +35,13 @@ def getFileInfo(filePath=''):
         propID = hdr['PROPOSID']
         instrume = hdr['INSTRUME']
         targname = hdr['TARGNAME'].replace('-','')
+        exptime = str(hdr['EXPTIME']).replace('.','p')
     except:
         noID = True
         print fSho
         return
 
-    print fSho, fStem, propID, instrume, targname
+    print fSho, fStem, propID, instrume, targname, exptime
     
 def go(srchStr='.fits'):
 
