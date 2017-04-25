@@ -19,7 +19,7 @@ def findFits(dirTop="", srchString='.fits'):
 
     return lFits
 
-def getFileInfo(filePath=''):
+def getFileInfo(filePath='', doMove=False):
     
     if len(filePath) < 1:
         return
@@ -85,8 +85,13 @@ def getFileInfo(filePath=''):
         pathSrc = sFil[:]
         filDest = os.path.split(sFil)[-1]
         pathDest = '%s/%s' % (dirOu, filDest)
-        print pathSrc, pathDest
-    
+        # print pathSrc, pathDest
+
+        if doMove:
+            if not os.access(dirOu, os.R_OK):
+                os.makedirs(dirOu)
+            os.rename(pathSrc, pathDest)
+        
 def getFilter(hdr):
 
     """Returns the filter from the header"""
@@ -105,7 +110,7 @@ def getFilter(hdr):
             
     return filtr
             
-def go(srchStr='.fits', doAll=True):
+def go(srchStr='.fits', doAll=True, doMove=False):
 
     """Wrapper - does the searching"""
 
