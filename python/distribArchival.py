@@ -123,7 +123,7 @@ def go(srchStr='.fits', doAll=True, doMove=False):
         iMax = len(LFits)
     
     for iFil in range(iMax):
-        getFileInfo(LFits[iFil])
+        getFileInfo(LFits[iFil], doMove=doMove)
 
 def goInSequence():
 
