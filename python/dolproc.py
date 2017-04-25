@@ -397,22 +397,38 @@ photometry from fits file (since is about a factor 10 faster)
             self.cols2Write.insert(5, 'DEC')
 
 def TestFindPhot(cam='ACS', field='SWEEPS', filtr='F625W', \
-                     pars1='param1.pars', pars2='param09chip2.pars', \
+                     parsChip1='param1.pars', \
+                 parsChip2='param09chip2.pars', \
                      fieldSplit='09', \
                      Debug=False, \
-                     dirBase='/home/wiclarks/Data/HST/12020/howardba_results/results'):
+                     dirBase='/home/wiclarks/Data/HST/12020/howardba_results/results', \
+                 fitsWithWCS=''):
 
-    """Tests finding the photometry"""
+    """Tests finding the photometry. Example call:
+
+    
+
+    If fitsWithWCS has nonzero length, doesn't use the paramfiles to
+    search for the WCS, but instead takes in the fitsWithWCS
+    file. WARNING - un-tested for flt.fits.
+
+    """
 
     P = PhotPaths(cam=cam, field=field, filtr=filtr, fieldSplit=fieldSplit, \
                       dirBase=dirBase)
     P.populatePathsPhot()
 
+    # look up the WCS fits file
+    haveFitsWCS = False
+    if len(fitsWithWCS) > 0:
+        if os.access(fitsWithWCS, os.R_OK):
+            haveFitsWCS = True
+    
     # The parameter file names have probably been set by hand. Put
     # that into a dictionary we can conveniently use, later on.
     parFiles = {}
-    parFiles['chip1'] =  pars1[:]
-    parFiles['chip2'] =  pars2[:]
+    parFiles['chip1'] =  parsChip1[:]
+    parFiles['chip2'] =  parsChip2[:]
     
     for sChip in ['chip1', 'chip2']:
 
@@ -425,9 +441,15 @@ def TestFindPhot(cam='ACS', field='SWEEPS', filtr='F625W', \
         PHOT.dirRefFits = paths['drzDir'][:]
     
         # now see if we have everything
-        PHOT.findPaths()
-        PHOT.parseParsFile()
-        PHOT.findRefImg()
+        PHOT.findPaths()  # find the photometry
+
+        # only search for the reference fits file if asked. 
+        if not haveFitsWCS:
+            PHOT.parseParsFile()
+            PHOT.findRefImg()
+        else:
+            PHOT.foundRefFits = True
+            PHOT.pathRefFits = fitsWithWCS[:]
 
         # Generate a sensible output filename
         stemOut = '%s_%s_%s' % (P.cam, P.field, P.filtr)
