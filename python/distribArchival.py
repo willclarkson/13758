@@ -36,13 +36,27 @@ def getFileInfo(filePath=''):
         instrume = hdr['INSTRUME']
         targname = hdr['TARGNAME'].replace('-','')
         exptime = str(hdr['EXPTIME']).replace('.','p')
+        filtr = getFilter(hdr)
     except:
         noID = True
         print fSho
         return
 
-    print fSho, fStem, propID, instrume, targname, exptime
-    
+    print fSho, fStem, propID, instrume, targname, exptime, filtr
+
+def getFilter(hdr):
+
+    """Returns the filter from the header"""
+
+    filtr='NONE'
+    for filtKey in ['FILTNAM', 'FILTER1']:
+        try:
+            filtr=hdr[filtKey]
+        except:
+            notFilt = True
+
+    return filtr
+            
 def go(srchStr='.fits'):
 
     """Wrapper - does the searching"""
