@@ -58,7 +58,7 @@ def getFileInfo(filePath=''):
     if len(targname) < 1:
         targname = 'NONE'
         
-    print fSho, fStem, propID, instrume, targname, exptime, filtr
+    #print fSho, fStem, propID, instrume, targname, exptime, filtr
 
     # use the information we have gathered to produce a destination
     # directory
@@ -72,7 +72,7 @@ def getFileInfo(filePath=''):
     else:
         dirSub = '%s/%s' % (dirSub, fSho.split('.fits')[0])
 
-    print dirSub
+    print fSho, fStem, dirSub
         
 def getFilter(hdr):
 
