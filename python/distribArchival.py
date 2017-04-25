@@ -35,8 +35,6 @@ def getFileInfo(filePath=''):
         propID = hdr['PROPOSID']
         instrume = hdr['INSTRUME']
         targname = hdr['TARGNAME'].replace('-','')
-        exptime = str(hdr['EXPTIME']).replace('.','p')
-        filtr = getFilter(hdr)
     except:
         noID = True
         print fSho
@@ -53,6 +51,9 @@ def getFileInfo(filePath=''):
     if isCalib:
         filtr='CALIB'
         exptime = ''
+
+    if len(propID) < 1:
+        propID = 'CAL'
         
     print fSho, fStem, propID, instrume, targname, exptime, filtr
 
