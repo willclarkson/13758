@@ -1,0 +1,70 @@
+#
+# 2017-04-25: Test parameter file for dolphot, wfpc2
+#
+# WIC
+#
+#
+# ============ Input file information
+Nimg = 1  # Number of images, not counting the reference image
+img0_file = u49n1801r_c0m
+img1_file = u49n1801r_c0m
+#
+# ============== Position-shifts 
+# set to 0 0 since we're 
+# going to rely on the WCS to do the
+# alignment for the moment...
+img0_shift = 0 0
+img1_shift = 0 0
+#
+# ============= Scale parameters 
+img0_xform = 1 0 0
+img1_xform = 1 0 0
+#
+# ============  Aperture photometry (from dolphot/wfc3 manual)
+img0_apsky = 15 25
+img1_apsky = 15 25
+#img2_apsky = 15 25
+#img3_apsky = 15 25
+#
+#
+# Now for some generic photometry options 
+# (again from the dolphot/wfc3 manual)
+RAper = 4          #photometry apeture size (flt)
+RChi = 2.0 	   # img_RChi
+PSFPhot = 1        #photometry type (int/0=aper,1=psf,2=wtd-psf)
+FitSky = 1         #fit sky? (int/0=no,1=yes,2=small,3=with-phot)
+RSky0 = 15         #inner sky radius (flt>=RAper+0.5)
+Rsky1 = 35         #outer sky radius (flt>=RSky0+1)
+SkipSky = 2        #spacing for sky measurement (int>0)
+SkySig = 2.25      #sigma clipping for sky (flt>=1)
+#
+# ===============  Some more generic parameters
+SecondPass = 5     #second pass finding stars (int 0=no,1=yes)
+SigFind = 3.0      #sigma detection threshold (flt)
+SigFindMult = 0.85 #Multiple for quick-and-dirty photometry (flt>0)
+SigFinal = 3.0     #sigma output threshold (flt)
+MaxIT = 25         #maximum iterations (int>0)
+NoiseMult = 0.10   #noise multiple in imgadd (flt)
+FSat = 0.999       #fraction of saturate limit (flt)
+ApCor = 1          #find/make aperture corrections? (int 0=no,1=yes)
+Force1 = 0         #force type 1/2 (stars)? (int 0=no,1=yes)
+# ===============  Astrometry parameters
+UseWCS = 1 	   #Use WCS header to estimate distortion (1=general linear)
+Align = 2          #align images? (int 0=no,1=const,2=lin,3=cube)
+Rotate = 1         #allow cross terms in alignment? (int 0=no, 1=yes)
+RCentroid = 2      #centroid box size (int>0)
+PosStep = 0.25     #search step for position iterations (flt)
+dPosMax = 2.5      #maximum single-step in position iterations (flt)
+RCombine = 1.5     #minimum separation for two stars for cleaning (flt)
+# 
+# ================ Some psf parameters
+RPSF = 10          #PSF size (int>0)
+SigPSF = 5.0       #min S/N for psf parameter fits (flt)
+PSFres = 1         #make PSF residual image? (int 0=no,1=yes)
+# WFC3UVISpsfType = 0	   #Use Anderson cores? (int)
+InterpPSFlib = 1   #Interpolate psf library? (~1% improvement but slower)
+#
+# ================ Misc new parameters
+FlagMask = 4 	   #Minimum badmask value to use
+WFPC2useCTE = 1	   #Use dolphot CTE correction
+CombineChi = 0	   # use chisq (noise sensitive)

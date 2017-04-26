@@ -1,0 +1,24 @@
+1. Extension (zero for base image)
+2. Chip (for three-dimensional FITS image)
+3. Object X position on reference image (or first image, if no reference)
+4. Object Y position on reference image (or first image, if no reference)
+5. Chi for fit
+6. Signal-to-noise
+7. Object sharpness
+8. Object roundness
+9. Direction of major axis (if not round)
+10. Crowding
+11. Object type (1=bright star, 2=faint, 3=elongated, 4=hot pixel, 5=extended)
+12. Measured counts, u49n1801r_c0m (F555W, 10.0 sec)
+13. Measured sky level, u49n1801r_c0m (F555W, 10.0 sec)
+14. Normalized count rate, u49n1801r_c0m (F555W, 10.0 sec)
+15. Normalized count rate uncertainty, u49n1801r_c0m (F555W, 10.0 sec)
+16. Instrumental VEGAMAG magnitude, u49n1801r_c0m (F555W, 10.0 sec)
+17. Transformed UBVRI magnitude, u49n1801r_c0m (F555W, 10.0 sec)
+18. Magnitude uncertainty, u49n1801r_c0m (F555W, 10.0 sec)
+19. Chi, u49n1801r_c0m (F555W, 10.0 sec)
+20. Signal-to-noise, u49n1801r_c0m (F555W, 10.0 sec)
+21. Sharpness, u49n1801r_c0m (F555W, 10.0 sec)
+22. Roundness, u49n1801r_c0m (F555W, 10.0 sec)
+23. Crowding, u49n1801r_c0m (F555W, 10.0 sec)
+24. Photometry quality flag, u49n1801r_c0m (F555W, 10.0 sec)

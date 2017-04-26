@@ -1,0 +1,52 @@
+1 sets of output data
+u49n1801r_c0m
+      0.00000000
+
+EXTENSION 1 CHIP 1
+Limits
+ 0 800 0 800
+* WFPC2-specific info
+* image 1: F555W 0 10.000000
+* ACS-specific info
+* WFC3-specific info
+Alignment
+ 0.000238 -0.000045 0.999999 0.000000 0.000000
+Aperture corrections
+  0.058105
+
+EXTENSION 2 CHIP 1
+Limits
+ 0 800 0 800
+* WFPC2-specific info
+* image 1: F555W 1 10.000000
+* ACS-specific info
+* WFC3-specific info
+Alignment
+ 0.000021 0.000022 1.000000 0.000000 -0.000015
+Aperture corrections
+  0.052593
+
+EXTENSION 3 CHIP 1
+Limits
+ 0 800 0 800
+* WFPC2-specific info
+* image 1: F555W 2 10.000000
+* ACS-specific info
+* WFC3-specific info
+Alignment
+ -0.000121 0.000088 1.000000 0.000000 0.000018
+Aperture corrections
+  0.059285
+
+EXTENSION 4 CHIP 1
+Limits
+ 0 800 0 800
+* WFPC2-specific info
+* image 1: F555W 3 10.000000
+* ACS-specific info
+* WFC3-specific info
+Alignment
+ 0.000149 0.000151 1.000000 0.000000 0.000017
+Aperture corrections
+  0.054222
+
