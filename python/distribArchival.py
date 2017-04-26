@@ -114,7 +114,7 @@ def go(srchStr='.fits', doAll=True, doMove=False):
 
     """Wrapper - does the searching"""
 
-    LFits = findFits(srchString=srchStr)
+    LFits = findFits(srchString=srchStr, dirTop=os.getcwd())
 
     print len(LFits)
 
