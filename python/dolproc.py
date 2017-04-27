@@ -13,9 +13,13 @@ import time
 
 import copy
 
+import numpy as np
+
 from astropy.io import fits
 from astropy.wcs import WCS
 
+# convenience methods for handling multiple WCS for WFPC2
+from wfpc2WCS import WFPC2WCS
 
 class PhotPaths(object):
 
@@ -27,7 +31,7 @@ class PhotPaths(object):
     def __init__(self, fieldSplit='09',\
                      cam='ACS',field='SWEEPS', filtr='F625W', \
                      Verbose=True, \
-                     dirBase='/home/wiclarks/Data/HST/12020/howardba_results/results'):
+                     dirBase='/home/wiclarks/Data/HST/12020/howardba_results/results', setOnInit=True):
 
         self.dirBase=dirBase[:]
 
@@ -40,7 +44,8 @@ class PhotPaths(object):
 
         # initialise the top-level photometry directory and find the
         # photometry files
-        self.findPhotDirs()
+        if setOnInit:
+            self.findPhotDirs()
 
         # file extensions we need in order to make progress
         self.extInfo = 'info'
@@ -68,8 +73,8 @@ class PhotPaths(object):
         self.setPhotTop()
         self.dirsPhot = glob.glob('%s/chip*' % (self.dirPhotTop))
 
-        print self.dirPhotTop
-        print self.dirsPhot
+        #print self.dirPhotTop
+        #print self.dirsPhot
         
     def populatePathsPhot(self):
 
@@ -146,6 +151,7 @@ class Phot(object):
     def __init__(self, dirPhot='', filPhot='', filInfo='', filCols='', \
                  dirRef='', filRef='', dirRefFits='', \
                  dirOut='', filOut='', \
+                 filRefFits = 'NONE', \
                  Verbose=True):
 
         # location information for photometry
@@ -160,7 +166,7 @@ class Phot(object):
         self.dirRefFits = dirRefFits[:]
 
         # reference image containing the WCS of the reference image
-        self.filRefFits = 'NONE'
+        self.filRefFits = filRefFits[:]
 
         # output directory
         self.dirOut = dirOut[:]
@@ -171,6 +177,9 @@ class Phot(object):
         self.foundRef=False
         self.foundRefFits = False
 
+        # is the reference fits image WFPC2?
+        self.refIsWFPC2 = False
+        
         # Column names for the photometry (since "col1, col2..."
         # aren't very readable)
         self.colNames = {}
@@ -189,15 +198,41 @@ class Phot(object):
 
         """Checks that the needed photometry files are all present."""
 
-        self.pathPhot='%s/%s' % (self.dirPhot, self.filPhot)
-        self.pathInfo='%s/%s' % (self.dirPhot, self.filInfo)
-        self.pathCols='%s/%s' % (self.dirPhot, self.filCols)
+        # carpentry... if the filPhot was given as a full path, not
+        # just a directory...
+
+        if self.filPhot.find('/') > -1:
+            self.pathPhot = self.filPhot[:]
+        else:
+            self.pathPhot='%s/%s' % (self.dirPhot, self.filPhot)
+
+        if self.filInfo.find('/') > -1:
+            self.pathInfo = self.filInfo[:]
+        else:
+            self.pathInfo='%s/%s' % (self.dirPhot, self.filInfo)
+
+        if self.filCols.find('/') > -1:
+            self.pathCols = self.filCols[:]
+        else:
+            self.pathCols='%s/%s' % (self.dirPhot, self.filCols)
 
         nFound = 0
-        for sPath in [self.pathPhot, self.pathInfo, self.pathCols]:
+        #for sPath in [self.pathPhot, self.pathInfo, self.pathCols]:
+        #    if os.access(sPath, os.R_OK):
+        #        nFound = nFound + 1
+
+        # allow updating by zipped file if present
+        for sAttr in ['pathPhot', 'pathInfo', 'pathCols']:
+            sPath = getattr(self, sAttr)
             if os.access(sPath, os.R_OK):
                 nFound = nFound + 1
-
+            else:
+                sZip = '%s.gz' % (sPath)
+                if os.access(sZip, os.R_OK):
+                    setattr(self, sAttr, sZip)
+                    nFound = nFound + 1
+            
+                
         if nFound > 2:
             self.foundPhot=True
 
@@ -206,7 +241,7 @@ class Phot(object):
         if os.access(self.pathRef, os.R_OK):
             self.foundRef=True
 
-        print "INFO - pathRef: %s" % (self.pathRef)
+        #print "INFO - pathRef: %s" % (self.pathRef)
 
     def parseParsFile(self, filExt='fits'):
 
@@ -215,7 +250,6 @@ class Phot(object):
         self.filRefFits = 'NONE'
         sSrch = 'img0_file'
         
-        self.findPaths()
         if not self.foundRef:
             return
         
@@ -235,7 +269,9 @@ class Phot(object):
         self.pathRefFits = False
         self.pathRefFits = '%s/%s' % (self.dirRefFits, self.filRefFits)
 
-        print "INFO - refFITS file should be: %s" % (self.pathRefFits)
+        if self.Verbose:
+            print "dolproc.Phot.findRefImg INFO - looking for reffits: %s" \
+                % (self.pathRefFits)
 
         # use glob to search for files with this or similar names
         if os.access(self.pathRefFits, os.R_OK):
@@ -244,20 +280,19 @@ class Phot(object):
     def loadPhot(self):
 
         """Loads the photometry file"""
-
-        # let's see what astropy does with this...
+                
         if not self.foundPhot:
             return
 
         self.setupPhotCols()
         
         if self.Verbose:
-            print "Phot.loadPhot INFO - loading dolphot file  %s" \
+            print "dolproc.Phot.loadPhot INFO - loading dolphot file  %s ..." \
                 % (self.pathPhot)
         t0 = time.time()
         self.tPhot = Table.read(self.pathPhot, format='ascii')
         if self.Verbose:
-            print "Phot.loadPhot INFO - ... done in %.1f seconds" \
+            print "dolproc.Phot.loadPhot INFO - ... done in %.1f seconds" \
                 % (time.time() - t0)
 
         self.renamePhotCols()
@@ -338,6 +373,9 @@ human-readable way"""
             sOut = self.dirPhot.split(sSplit)[-1].replace('/','_')
             self.filOut = '%s_PHOT.fits' % (sOut)
 
+        # ensure the directory is meaningful...
+        self.filOut = os.path.split(self.filOut)[-1]
+            
         self.pathOut = '%s/%s' % (self.dirOut, self.filOut)
 
     def writePhot2Fits(self):
@@ -346,6 +384,10 @@ human-readable way"""
 
         self.setOutPath()
 
+        if self.Verbose:
+            print "dolproc.Phot.writePhot2Fits INFO - writing to %s" \
+                % (self.pathOut)
+        
         # add the reference image as a keyword
         self.tPhot.meta['refPars'] = self.filRef[:]
         self.tPhot.meta['refImg'] = self.filRefFits[:]
@@ -374,6 +416,14 @@ photometry from fits file (since is about a factor 10 faster)
         if not self.foundRefFits:
             return
 
+        self.checkIsWFPC2()
+
+        if self.refIsWFPC2:
+            if self.Verbose:
+                print "dolproc.Phot.loadWCS INFO - assuming WFPC2 image."
+            self.wcs = WFPC2WCS(self.pathRefFits, Verbose=False)
+            return
+        
         self.wcs = WCS(self.pathRefFits)
 
     def pix2Sky(self):
@@ -382,9 +432,15 @@ photometry from fits file (since is about a factor 10 faster)
 
         xPix = self.tPhot['X']
         yPix = self.tPhot['Y']
-        
-        RA, DEC = self.wcs.all_pix2world(xPix, yPix, 0)
 
+        if not self.refIsWFPC2:
+            RA, DEC = self.wcs.all_pix2world(xPix, yPix, 0)
+        else:
+            # otherwise, loop through the chips
+            xten = self.tPhot['Extension']
+            RA, DEC = self.wcs.doPix2WorldMulti(xPix, yPix, xten)
+            
+            
         # just put in as a basic array for the moment... We'll worry
         # about units later if the calling program actually needs
         # them.
@@ -395,7 +451,19 @@ photometry from fits file (since is about a factor 10 faster)
         if not 'RA' in self.cols2Write:
             self.cols2Write.insert(4, 'RA')
             self.cols2Write.insert(5, 'DEC')
+            
+    def checkIsWFPC2(self):
 
+        """Checks if the reference image is WFPC2"""
+
+        # we can update the method if we like here (e.g. check the
+        # fits header for the INSTRUME keyword). For the moment, I
+        # will just trust the STScI-set filename convention.
+
+        self.refIsWFPC2 = False
+        if os.path.split(self.pathRefFits)[-1].find('c0m') > -1:
+            self.refIsWFPC2 = True 
+        
 def TestFindPhot(cam='ACS', field='SWEEPS', filtr='F625W', \
                      parsChip1='param1.pars', \
                  parsChip2='param09chip2.pars', \
@@ -466,3 +534,48 @@ def TestFindPhot(cam='ACS', field='SWEEPS', filtr='F625W', \
         PHOT.pix2Sky()
         PHOT.writePhot2Fits()
 
+
+def TestLoadWFPC2(photStem='TEST', refFits='u49n1801r_c0m.fits', \
+                  Verbose=True):
+
+    """Try loading the dolphot and WCS for a WFPC2 image-photometry pair,
+    attaching celestial coordinates to the objects using the WCS in
+    the fits header.
+
+    In this scenario, both the reference-FITS file and the
+    photometry are in the same directory.
+
+    This example is simpler than TestFindPhot because here we give the
+    photometry-stem as well as the reference FITS file with the WCS
+    attached. So the routine doesn't have to construct all the paths
+    from the assumed directory convention.
+
+    """
+
+    dirIn = os.getcwd()
+
+    # find the files
+    PP = PhotPaths(setOnInit=False)
+    fPhot, fInfo, fCols = PP.getPhotFile(dirIn, photStem)
+
+    PHO = Phot(dirIn, fPhot, fInfo, fCols, \
+               dirRefFits=dirIn, \
+               filRefFits=refFits[:], \
+               dirRef=dirIn, \
+               filOut='%s_PHOT.fits' % (fPhot), \
+               Verbose=Verbose)
+
+    # Now try loading
+    PHO.findPaths()
+    PHO.loadPhot()
+
+    # try loading the WCS and projecting coords onto the sky
+    PHO.findRefImg()
+    PHO.loadWCS()
+    PHO.pix2Sky()
+
+    # now write the output to fits
+    PHO.writePhot2Fits()
+    
+    # try writing to text for easy RA, DEC plotting with Starlink-GAIA
+    PHO.tPhot[PHO.cols2Write].write('TEST_PHOT.txt', format='ascii')
