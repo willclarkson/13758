@@ -133,7 +133,7 @@ class WFPC2WCS(object):
         if not self.doTest:
             return
 
-        dirFits = '/home/wiclarks/Data/scratch/testBoresight/veronicaDOLPHOT/testGAIA'
+        dirFits = '/home/wiclarks/Data/scratch/testBoresight/testWFPC2/testGAIA'
         filFits = 'u49n1801r_c0m.fits'
 
         self.pathFits = '%s/%s' % (dirFits, filFits)
