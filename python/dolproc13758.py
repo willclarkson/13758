@@ -535,16 +535,17 @@ def TestFindPhot(cam='ACS', field='SWEEPS', filtr='F625W', \
         PHOT.pix2Sky()
         PHOT.writePhot2Fits()
 
-
-def LoadPhotom(photStem='TEST', \
-                   refFits='u49n1801r_c0m.fits', \
-                   dirIn=os.getcwd(), \
-                   dirRefFits=os.getcwd(), \
-                   Verbose=True):
+def loadAndProject(photStem='TEST', \
+                       refFits='u49n1801r_c0m.fits', \
+                       dirIn=os.getcwd(), \
+                       dirRefFits=os.getcwd(), \
+                       Verbose=True):
 
     """Loads dolphot photometry files beginning with "photStem,"
     merging into a .fits file for the photometry (currently in the
     frame of teh reference file only).
+
+    Returns the output file written.
 
     If the reference fits image (or headerlet) with the world
     co-ordinate system is present (given by "refFits"), the world
@@ -588,3 +589,5 @@ def LoadPhotom(photStem='TEST', \
     
     # try writing to text for easy RA, DEC plotting with Starlink-GAIA
     # PHO.tPhot[PHO.cols2Write].write('%s_PHOT.txt' % (photStem), format='ascii')
+
+    return PHO.pathOut
