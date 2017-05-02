@@ -447,9 +447,10 @@ photometry from fits file (since is about a factor 10 faster)
         self.tPhot['RA'] = RA
         self.tPhot['DEC'] = DEC
 
-        # insert RA, DEC into the columns to write
+        # insert RA, DEC into the columns to write if not there already
         if not 'RA' in self.cols2Write:
             self.cols2Write.insert(4, 'RA')
+        if not 'DEC' in self.cols2Write:
             self.cols2Write.insert(5, 'DEC')
             
     def checkIsWFPC2(self):
@@ -535,24 +536,29 @@ def TestFindPhot(cam='ACS', field='SWEEPS', filtr='F625W', \
         PHOT.writePhot2Fits()
 
 
-def TestLoadWFPC2(photStem='TEST', refFits='u49n1801r_c0m.fits', \
-                  Verbose=True):
+def LoadPhotom(photStem='TEST', \
+                   refFits='u49n1801r_c0m.fits', \
+                   dirIn=os.getcwd(), \
+                   dirRefFits=os.getcwd(), \
+                   Verbose=True):
 
-    """Try loading the dolphot and WCS for a WFPC2 image-photometry pair,
-    attaching celestial coordinates to the objects using the WCS in
-    the fits header.
+    """Loads dolphot photometry files beginning with "photStem,"
+    merging into a .fits file for the photometry (currently in the
+    frame of teh reference file only).
 
-    In this scenario, both the reference-FITS file and the
-    photometry are in the same directory.
+    If the reference fits image (or headerlet) with the world
+    co-ordinate system is present (given by "refFits"), the world
+    coordinates are added to the output fits file. Arguments:
 
-    This example is simpler than TestFindPhot because here we give the
-    photometry-stem as well as the reference FITS file with the WCS
-    attached. So the routine doesn't have to construct all the paths
-    from the assumed directory convention.
+    photStem -- filename stem for the DOLPHOT output
+
+    refFits -- fits file with WCS info
+
+    dirIn -- directory holding the photometry
+
+    dirRefFits -- directory holding the reference fits file
 
     """
-
-    dirIn = os.getcwd()
 
     # find the files
     PP = PhotPaths(setOnInit=False)
@@ -561,7 +567,7 @@ def TestLoadWFPC2(photStem='TEST', refFits='u49n1801r_c0m.fits', \
     PHO = Phot(dirIn, fPhot, fInfo, fCols, \
                dirRefFits=dirIn, \
                filRefFits=refFits[:], \
-               dirRef=dirIn, \
+               dirRef=dirRefFits, \
                filOut='%s_PHOT.fits' % (fPhot), \
                Verbose=Verbose)
 
@@ -572,10 +578,13 @@ def TestLoadWFPC2(photStem='TEST', refFits='u49n1801r_c0m.fits', \
     # try loading the WCS and projecting coords onto the sky
     PHO.findRefImg()
     PHO.loadWCS()
-    PHO.pix2Sky()
+    try:
+        PHO.pix2Sky()
+    except:
+        print "LoadPhotom WARN - world co-ordinate transformation failed."
 
     # now write the output to fits
     PHO.writePhot2Fits()
     
     # try writing to text for easy RA, DEC plotting with Starlink-GAIA
-    PHO.tPhot[PHO.cols2Write].write('TEST_PHOT.txt', format='ascii')
+    # PHO.tPhot[PHO.cols2Write].write('%s_PHOT.txt' % (photStem), format='ascii')
