@@ -920,6 +920,10 @@ def testRegion(magLo=14., magHi=18., pathIn='', tryChandra=False, \
         OC.matchCleanIters = 5
     OC.loadPhot()
     
+    if len(OC.tPhot)<1:
+        print "testRegionFATAL- cannot load photometry %s"%(OC.pathPhot)
+        return
+    
     if debugNudge:
         OC.nudgeObsPositions()
 
