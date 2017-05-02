@@ -880,7 +880,8 @@ already have a file in mind, say).
 def testRegion(magLo=14., magHi=18., pathIn='', tryChandra=False, \
                debugNudge=False, iters=5, colRA='RA', colDE='DEC', \
                colMag='Instrumental_VEGAMAG', \
-               img2Shift='', showLog=False):
+               img2Shift='', showLog=False, \
+                   doHeaderCorrection=True):
 
     """Tests the region bounding the photometry catalog.
 
@@ -957,30 +958,11 @@ def testRegion(magLo=14., magHi=18., pathIn='', tryChandra=False, \
     OC.matchOnSphere()
 
     OC.showDistributions(doLog=showLog)
+
+    # Correct the CRVAL in the reference fits image header
+    if doHeaderCorrection:
+        OC.updateImageRefCoo(img2Shift)
+
+
     return
 
-    OC.showSelectedPoints()
-
-    # nudge the image header
-    OC.updateImageRefCoo(img2Shift)
-
-    # write the astrom catalog to disk - this time using our
-    # class-level variable
-    OC.writeAstCat()
-    # OC.writeAstCat('TEST_astromCat.csv')
-    
-    return
-    
-    # Now build an astrometric catalog from the result and query it
-    AC = AstCat(OC.cenRA, OC.cenDE, OC.boxWidth, OC.boxHeight)
-
-    AC.doQuery()
-    print AC.tCat.colnames
-    
-#    print np.shape(OC.bbox)
-#    OC.findMBR()
-#    print np.shape(OC.bbox)
-
-#    print OC.bbox
-    
-#    OC.showSelectedPoints()
