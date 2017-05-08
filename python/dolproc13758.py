@@ -183,8 +183,8 @@ class Phot(object):
         # Column names for the photometry (since "col1, col2..."
         # aren't very readable)
         self.colNames = {}
-        self.cols2Write = {}
-        
+        self.cols2Write = []
+   
         # table holding the photometry
         self.tPhot = Table()
 
