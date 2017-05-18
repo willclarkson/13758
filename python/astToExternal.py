@@ -902,6 +902,8 @@ def testRegion(magLo=14., magHi=18., pathIn='', tryChandra=False, \
     OC.colRA = colRA[:]
     OC.colDE = colDE[:]
     
+    OC.colMag = colMag[:]
+
     OC.matchCleanIters = iters
 
     OC.nudgeRAtest = 0.
