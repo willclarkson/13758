@@ -392,6 +392,8 @@ human-readable way"""
         self.tPhot.meta['refPars'] = self.filRef[:]
         self.tPhot.meta['refImg'] = self.filRefFits[:]
 
+        print self.cols2Write
+
         cols2Write = self.cols2Write[:]
         if len(cols2Write) < 1:
             cols2Write = self.tPhot.colnames
