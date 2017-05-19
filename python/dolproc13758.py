@@ -27,7 +27,7 @@ class PhotPaths(object):
     directory. Also finds the parameters
 
     """
-    
+
     def __init__(self, fieldSplit='09',\
                      cam='ACS',field='SWEEPS', filtr='F625W', \
                      Verbose=True, \
@@ -53,9 +53,9 @@ class PhotPaths(object):
 
         # store the paths in a dictionary, with one keyword per chip
         self.pathsPhot={}
-        
+
         self.Verbose=Verbose
-        
+
     def setPhotTop(self):
 
         """Builds the photometry directory from the options chosen"""
@@ -75,7 +75,7 @@ class PhotPaths(object):
 
         #print self.dirPhotTop
         #print self.dirsPhot
-        
+
     def populatePathsPhot(self):
 
         """Populates the paths for the photometry files"""
@@ -88,7 +88,7 @@ class PhotPaths(object):
                 if os.access(sFil, os.R_OK):
                     nFound = nFound + 1
 
-                    
+
             # ignore this chip if <3 found
             if nFound < 3:
                 continue
@@ -147,7 +147,7 @@ class PhotPaths(object):
 class Phot(object):
 
     """Class to read and translate DOLPHOT photometry output"""
-    
+
     def __init__(self, dirPhot='', filPhot='', filInfo='', filCols='', \
                  dirRef='', filRef='', dirRefFits='', \
                  dirOut='', filOut='', \
@@ -179,21 +179,21 @@ class Phot(object):
 
         # is the reference fits image WFPC2?
         self.refIsWFPC2 = False
-        
+
         # Column names for the photometry (since "col1, col2..."
         # aren't very readable)
         self.colNames = {}
         self.cols2Write = []
-   
+
         # table holding the photometry
         self.tPhot = Table()
 
         # WCS object
         self.wcs = None
-        
+
         # control variable
         self.Verbose=Verbose
-        
+
     def findPaths(self):
 
         """Checks that the needed photometry files are all present."""
@@ -231,8 +231,8 @@ class Phot(object):
                 if os.access(sZip, os.R_OK):
                     setattr(self, sAttr, sZip)
                     nFound = nFound + 1
-            
-                
+
+
         if nFound > 2:
             self.foundPhot=True
 
@@ -249,10 +249,10 @@ class Phot(object):
 
         self.filRefFits = 'NONE'
         sSrch = 'img0_file'
-        
+
         if not self.foundRef:
             return
-        
+
         # now load the image
         with open(self.pathRef, 'r') as rObj:
             for sLine in rObj:
@@ -280,12 +280,12 @@ class Phot(object):
     def loadPhot(self):
 
         """Loads the photometry file"""
-                
+
         if not self.foundPhot:
             return
 
         self.setupPhotCols()
-        
+
         if self.Verbose:
             print "dolproc.Phot.loadPhot INFO - loading dolphot file  %s ..." \
                 % (self.pathPhot)
@@ -296,7 +296,7 @@ class Phot(object):
                 % (time.time() - t0)
 
         self.renamePhotCols()
-        
+
     def setupPhotCols(self):
 
         """Helps set the column names for DOLPHOT output in a pithy but
@@ -307,7 +307,7 @@ human-readable way"""
 
         # Sometimes the second entry in the description is perfectly fine
         lJoin = [7, 8, 11, 12, 13, 16, 17, 18, 19, 20, 21, 22, 23, 24]
-        
+
         LCols = []
         LVals = []
         with open(self.pathCols, 'r') as rObj:
@@ -326,7 +326,7 @@ human-readable way"""
 
                 # remove any commas
                 sVal = sVal.replace(',','')
-                    
+
                 LCols.append('col%i' % (iCol))
                 LVals.append(sVal)
 
@@ -334,7 +334,7 @@ human-readable way"""
         self.cols2Write = []
         for iCol in range(24):
             self.colNames[LCols[iCol]] = LVals[iCol]
-            
+
         # now correct some of the less obvious ones by-hand:
         self.colNames['col3'] = 'X'
         self.colNames['col4'] = 'Y'
@@ -347,7 +347,7 @@ human-readable way"""
         for iCol in range(1,25):
             sCol = 'col%i' % (iCol)
             self.cols2Write.append(self.colNames[sCol])
-        
+
     def renamePhotCols(self):
 
         """Renames the photometry columns"""
@@ -375,7 +375,7 @@ human-readable way"""
 
         # ensure the directory is meaningful...
         self.filOut = os.path.split(self.filOut)[-1]
-            
+
         self.pathOut = '%s/%s' % (self.dirOut, self.filOut)
 
     def writePhot2Fits(self):
@@ -387,7 +387,7 @@ human-readable way"""
         if self.Verbose:
             print "dolproc.Phot.writePhot2Fits INFO - writing to %s" \
                 % (self.pathOut)
-        
+
         # add the reference image as a keyword
         self.tPhot.meta['refPars'] = self.filRef[:]
         self.tPhot.meta['refImg'] = self.filRefFits[:]
@@ -397,7 +397,7 @@ human-readable way"""
         cols2Write = self.cols2Write[:]
         if len(cols2Write) < 1:
             cols2Write = self.tPhot.colnames
-            
+
         self.tPhot[cols2Write].write(self.pathOut, format='fits', overwrite=True)
 
     def getPhotFromFits(self):
@@ -407,9 +407,9 @@ photometry from fits file (since is about a factor 10 faster)
 
         """
 
-        self.tPhot = Table.read('ACS_SWEEPS_F625W_09_chip1_PHOT.fits')        
+        self.tPhot = Table.read('ACS_SWEEPS_F625W_09_chip1_PHOT.fits')
         self.cols2Write = self.tPhot.colnames[0:24]
-        
+
 
     def loadWCS(self):
 
@@ -425,7 +425,7 @@ photometry from fits file (since is about a factor 10 faster)
                 print "dolproc.Phot.loadWCS INFO - assuming WFPC2 image."
             self.wcs = WFPC2WCS(self.pathRefFits, Verbose=False)
             return
-        
+
         self.wcs = WCS(self.pathRefFits)
 
     def pix2Sky(self):
@@ -441,8 +441,8 @@ photometry from fits file (since is about a factor 10 faster)
             # otherwise, loop through the chips
             xten = self.tPhot['Extension']
             RA, DEC = self.wcs.doPix2WorldMulti(xPix, yPix, xten)
-            
-            
+
+
         # just put in as a basic array for the moment... We'll worry
         # about units later if the calling program actually needs
         # them.
@@ -454,7 +454,7 @@ photometry from fits file (since is about a factor 10 faster)
             self.cols2Write.insert(4, 'RA')
         if not 'DEC' in self.cols2Write:
             self.cols2Write.insert(5, 'DEC')
-            
+
     def checkIsWFPC2(self):
 
         """Checks if the reference image is WFPC2"""
@@ -465,8 +465,8 @@ photometry from fits file (since is about a factor 10 faster)
 
         self.refIsWFPC2 = False
         if os.path.split(self.pathRefFits)[-1].find('c0m') > -1:
-            self.refIsWFPC2 = True 
-        
+            self.refIsWFPC2 = True
+
 def TestFindPhot(cam='ACS', field='SWEEPS', filtr='F625W', \
                      parsChip1='param1.pars', \
                  parsChip2='param09chip2.pars', \
@@ -477,7 +477,7 @@ def TestFindPhot(cam='ACS', field='SWEEPS', filtr='F625W', \
 
     """Tests finding the photometry. Example call:
 
-    
+
 
     If fitsWithWCS has nonzero length, doesn't use the paramfiles to
     search for the WCS, but instead takes in the fitsWithWCS
@@ -494,27 +494,27 @@ def TestFindPhot(cam='ACS', field='SWEEPS', filtr='F625W', \
     if len(fitsWithWCS) > 0:
         if os.access(fitsWithWCS, os.R_OK):
             haveFitsWCS = True
-    
+
     # The parameter file names have probably been set by hand. Put
     # that into a dictionary we can conveniently use, later on.
     parFiles = {}
     parFiles['chip1'] =  parsChip1[:]
     parFiles['chip2'] =  parsChip2[:]
-    
+
     for sChip in ['chip1', 'chip2']:
 
         paths = P.pathsPhot[sChip]
-       
+
         PHOT = Phot(paths['dirFull'], paths['phot'], \
                         paths['info'], paths['columns'], \
                         paths['parsDir'])
         PHOT.filRef=parFiles[sChip]
         PHOT.dirRefFits = paths['drzDir'][:]
-    
+
         # now see if we have everything
         PHOT.findPaths()  # find the photometry
 
-        # only search for the reference fits file if asked. 
+        # only search for the reference fits file if asked.
         if not haveFitsWCS:
             PHOT.parseParsFile()
             PHOT.findRefImg()
@@ -527,12 +527,12 @@ def TestFindPhot(cam='ACS', field='SWEEPS', filtr='F625W', \
         if len(P.fieldSplit) > 0:
             stemOut = '%s_%s' % (stemOut, P.fieldSplit)
         PHOT.filOut='%s_%s_PHOT.fits' % (stemOut, sChip)
-        
+
         if Debug:
             PHOT.getPhotFromFits()
         else:
             PHOT.loadPhot()
-            
+
         PHOT.loadWCS()
         PHOT.pix2Sky()
         PHOT.writePhot2Fits()
@@ -578,6 +578,14 @@ def loadAndProject(photStem='TEST', \
     PHO.findPaths()
     PHO.loadPhot()
 
+    # Exit gracefully if the column file not found
+    if not PHO.foundPhot:
+
+        print "loadAndProject FATAL - PHO.foundPhot", PHO.foundPhot
+        print PHO.pathCols
+        print PHO.pathInfo
+        return
+
     # try loading the WCS and projecting coords onto the sky
     PHO.findRefImg()
     PHO.loadWCS()
@@ -588,7 +596,7 @@ def loadAndProject(photStem='TEST', \
 
     # now write the output to fits
     PHO.writePhot2Fits()
-    
+
     # try writing to text for easy RA, DEC plotting with Starlink-GAIA
     # PHO.tPhot[PHO.cols2Write].write('%s_PHOT.txt' % (photStem), format='ascii')
 
